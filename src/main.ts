@@ -12,7 +12,8 @@ export class ModuleInstance extends InstanceBase<ModuleConfig> {
 	variableUpdateEnabled: boolean = false
 	config!: ModuleConfig // Setup in init()
 	private pollTimer: NodeJS.Timeout | undefined
-
+	republishRulesCache: { id: string; label: string }[] = []
+	republishRulesRawIds: Set<string> = new Set()
 
 	constructor(internal: unknown) {
 		super(internal)
@@ -72,6 +73,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig> {
 
 			//List Updates
 			await this.updateServerStatus()
+			this.syncRepublishRules()
 
 
 		} catch (error) {
@@ -198,6 +200,34 @@ export class ModuleInstance extends InstanceBase<ModuleConfig> {
 		}
 	}
 
+	async apiDeleteWithoutBody(apimethod: string): Promise<unknown> {
+		this.log('debug', `Send DELETE request to ${apimethod}`)
+		const url = this.generateRequestUrl(`http://${this.config.server}:${this.config.port}/${apimethod}`)
+		this.log('debug', `API Url: ${url}`)
+		
+
+		try {
+			const response = await fetch(url, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			})
+
+			const text = await response.text()
+			this.log('debug', `Response-Text: ${text}`)
+
+			try {
+				return JSON.parse(text)
+			} catch {
+				return text
+			}
+		} catch (error) {
+			this.log('error', `DELETE ${apimethod} failed: ${error}`)
+			return null
+		}
+	}
+
 	generateRequestUrl(requesturl: string): string {
 		var request_url = requesturl
 		if (this.config.key != "") {
@@ -259,6 +289,41 @@ export class ModuleInstance extends InstanceBase<ModuleConfig> {
 			this.log('error', `Failed to fetch server status: ${err}`)
 			this.updateStatus(InstanceStatus.UnknownError)
 
+		}
+	}
+
+	//Cyclic Methods:
+
+	async syncRepublishRules(): Promise<void> {
+		try {
+			const data = await this.apiGet('manage/rtmp/republish')
+
+			if (!data || !Array.isArray(data.rules)) {
+				this.log('error', 'Republish Rules API returned unexpected data')
+				return
+			}
+
+			const rules = data.rules
+			const newIds = new Set<string>(rules.map((rule: any) => rule.id))
+
+			const idsEqual =
+				newIds.size === this.republishRulesRawIds?.size &&
+				[...newIds].every((id: any) => this.republishRulesRawIds.has(id))
+
+			if (!idsEqual) {
+				this.republishRulesCache = rules.map((rule: any) => ({
+					id: rule.id,
+					label: `[${rule.id}] ${rule.src_app}/${rule.src_stream} → ${rule.dest_addr}:${rule.dest_port}/${rule.dest_app}/${rule.dest_stream}`,
+				}))
+				this.republishRulesRawIds = newIds
+
+				this.log('info', `Updated Republish Rules Cache with ${rules.length} entries`)
+				this.updateActions()
+			} else {
+				this.log('debug', 'Republish Rules unchanged, no update needed.')
+			}
+		} catch (error) {
+			this.log('error', `Failed to sync Republish Rules: ${error}`)
 		}
 	}
 
