@@ -1,7 +1,7 @@
 {
 	"id": "softvelum-nimble-streamer",
 	"name": "softvelum-nimble-streamer",
-	"shortname": "wmspanel",
+	"shortname": "nimble-streamer",
 	"description": "Controls Softvelums Nimble Streamer",
 	"version": "0.0.0",
 	"license": "MIT",
