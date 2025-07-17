@@ -248,7 +248,6 @@ export class ModuleInstance extends InstanceBase<ModuleConfig> {
 
 
 
-	//Methods to Update Variables:
 	async updateServerStatus(): Promise<void> {
 		try {
 			const response = await this.apiGet('manage/server_status')
@@ -258,10 +257,8 @@ export class ModuleInstance extends InstanceBase<ModuleConfig> {
 				return
 			}
 
-			// Optionales Logging der Antwort (z. B. zu Debugzwecken)
 			this.log('info', `Server status received: ${JSON.stringify(response)}`)
 
-			// Hauptwerte
 			if (typeof response.Connections === 'number') {
 				this.setVariableValues({ connections: response.Connections })
 			}
@@ -269,7 +266,6 @@ export class ModuleInstance extends InstanceBase<ModuleConfig> {
 				this.setVariableValues({ outRate: response.OutRate })
 			}
 
-			// Systeminformationen
 			if (typeof response.SysInfo === 'object') {
 				const sys = response.SysInfo
 				this.setVariableValues({

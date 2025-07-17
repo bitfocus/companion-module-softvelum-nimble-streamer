@@ -139,7 +139,7 @@ export function UpdateActions(self: ModuleInstance): void {
 				const apiPath = `manage/rtmp/republish/${ruleId}`
 				await self.apiDeleteWithoutBody(apiPath)
 
-				await self.syncRepublishRules() // Aktualisiere Cache nach Löschung
+				await self.syncRepublishRules()
 			},
 		}
 
