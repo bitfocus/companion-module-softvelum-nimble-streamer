@@ -4,6 +4,7 @@ import { UpdateVariableDefinitions } from './variables.js'
 import { UpgradeScripts } from './upgrades.js'
 import { UpdateActions } from './actions.js'
 import { UpdateFeedbacks } from './feedbacks.js'
+import crypto from 'crypto'
 
 
 export class ModuleInstance extends InstanceBase<ModuleConfig> {
@@ -203,11 +204,12 @@ export class ModuleInstance extends InstanceBase<ModuleConfig> {
 
 			const salt = Math.floor(Math.random() * 1_000_001) // rand(0, 1000000)
 			const str2hash = `${salt}/${this.config.key}`
-			const crypto = require('crypto')
+			//const crypto = require('crypto')
+
 			const md5raw = crypto.createHash('md5').update(str2hash).digest() // raw binary
 			const base64hash = md5raw.toString('base64')
 
-			request_url = `${requesturl}?salt=${salt}&hash=${encodeURIComponent(base64hash)}`
+			request_url = `${requesturl}?salt=${salt}&hash=${base64hash}`
 			this.log('debug', `Generated Request: ${request_url}`)
 		}
 
