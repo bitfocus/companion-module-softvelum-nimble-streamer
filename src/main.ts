@@ -229,7 +229,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig> {
 	}
 
 	generateRequestUrl(requesturl: string): string {
-		var request_url = requesturl
+		let request_url = requesturl
 		if (this.config.key != "") {
 
 			const salt = Math.floor(Math.random() * 1_000_001) // rand(0, 1000000)
@@ -257,7 +257,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig> {
 				return
 			}
 
-			this.log('info', `Server status received: ${JSON.stringify(response)}`)
+			this.log('debug', `Server status received: ${JSON.stringify(response)}`)
 
 			if (typeof response.Connections === 'number') {
 				this.setVariableValues({ connections: response.Connections })
@@ -278,7 +278,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig> {
 				})
 			}
 
-			this.log('info', 'Server status updated successfully.')
+			this.log('debug', 'Server status updated successfully.')
 			this.updateStatus(InstanceStatus.Ok)
 
 		} catch (err) {
@@ -313,7 +313,7 @@ export class ModuleInstance extends InstanceBase<ModuleConfig> {
 				}))
 				this.republishRulesRawIds = newIds
 
-				this.log('info', `Updated Republish Rules Cache with ${rules.length} entries`)
+				this.log('debug', `Updated Republish Rules Cache with ${rules.length} entries`)
 				this.updateActions()
 			} else {
 				this.log('debug', 'Republish Rules unchanged, no update needed.')

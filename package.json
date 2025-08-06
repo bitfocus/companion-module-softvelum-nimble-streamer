@@ -1,6 +1,6 @@
 {
 	"name": "softvelum-nimble-streamer",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"main": "dist/main.js",
 	"type": "module",
 	"scripts": {
@@ -19,8 +19,7 @@
 		"url": "git+https://github.com/bitfocus/companion-module-softvelum-nimble-streamer.git"
 	},
 	"dependencies": {
-		"@companion-module/base": "^1.12.1",
-		"node-fetch": "^3.3.2"
+		"@companion-module/base": "^1.12.1"
 	},
 	"devDependencies": {
 		"@companion-module/tools": "^2.1.1",
